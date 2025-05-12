@@ -1,8 +1,9 @@
 import React from 'react'
+import Navheader from '../components/Navheader'
 
 const HomePage = () => {
   return (
-    <div>HomePage</div>
+    <Navheader />
   )
 }
 
