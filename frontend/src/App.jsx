@@ -13,6 +13,7 @@ import PageLoader from "./components/PageLoader.jsx"
 import useAuthUser from "./hooks/useAuthUser.jsx"
 import { use } from "react"
 import { useThemeStore } from "./store/useThemeStore.js"
+import Layout from "./components/Layout.jsx"
 export default function App() {
   
 
@@ -32,10 +33,14 @@ export default function App() {
   }
   return (
     
-    <div className="h-screen " data-theme={theme} >
+    <div className="h-[100vh]" data-theme={theme} >
       
       <Routes>
-        <Route path="/" element={isAuthenticated && isOnBoarded ? <HomePage/>: <Navigate to={!isAuthenticated ? "/login" : "/onboarding"}/>}/>
+        <Route path="/" element={isAuthenticated && isOnBoarded ? ( 
+          <Layout showSideBar={true}>
+            <HomePage/>
+          </Layout> ): 
+          (<Navigate to={!isAuthenticated ? "/login" : "/onboarding"}/>)}/>
         <Route path="/login" element={!isAuthenticated ? <LoginPage/>:<Navigate to={isOnBoarded?"/":"/onboarding"}/>}/>
         <Route path="/signup" element={!isAuthenticated ?<SignUpPage/>:<Navigate to={isOnBoarded?"/":"/onboarding"}/>}/>
         <Route path="/onboarding" element={isAuthenticated ?
@@ -43,7 +48,13 @@ export default function App() {
           !isOnBoarded ? (<OnboardingPage/>):(<Navigate to='/'/> )
           
         ) :( <Navigate to='/login '/>)}/>
-        <Route path="/notifications" element={isAuthenticated ?<NotificationsPage/>:<Navigate to='/login '/>}/>
+        <Route path="/notifications" element={isAuthenticated && isOnBoarded ?(
+          <Layout showSideBar={true}>
+            <NotificationsPage/>
+          </Layout>
+
+          ):(<Navigate to={!isAuthenticated ? "/login" : "/onboarding"}/>)
+        }/>
         <Route path="/call" element={isAuthenticated ?<CallPage/>:<Navigate to='/login '/>}/>
         <Route path="/chat" element={isAuthenticated ?<ChatPage/>:<Navigate to='/login '/>}/>
       </Routes>
