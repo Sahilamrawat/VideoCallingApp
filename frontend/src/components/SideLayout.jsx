@@ -1,7 +1,12 @@
-import { BellIcon, Boxes, HomeIcon, UserIcon } from 'lucide-react'
+import { BellIcon, Boxes, HomeIcon, MessageCircle, UserIcon } from 'lucide-react'
 import React, { use, useState } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import useAuthUser from '../hooks/useAuthUser';
+import NoFriendsFound from './NoFriendsFound';
+import FriendCard from './FriendCard';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getUserFriends } from '../lib/api';
+import FriendNav from './FriendNav';
 
 const SideLayout = () => {
 
@@ -9,6 +14,13 @@ const SideLayout = () => {
     const location=useLocation();
     const currentPath=location.pathname;
     const [activeIndex=0,setActiveIndex] = useState(null);
+    const queryClient=useQueryClient();
+    const {data:friends=[], isLoading:loadingFriends} =useQuery(
+        {
+          queryKey:["friends"],
+          queryFn:getUserFriends,
+        }
+      );
   return (
     <aside className='w-64 bg-base-200 border-r border-base-300 hidden h-screen sticky  lg:flex flex-col top-0 '>
         <div className=' p-5 '>
@@ -17,7 +29,7 @@ const SideLayout = () => {
                 <span className="text-3xl font-bold font-mono bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent tracking-wider">VivoChat</span>
             </Link>
         </div>
-        <nav className='flex-1 p-4 space-y-2'>
+        <nav className='flex-1 p-4 space-y-2 border-'>
             <Link to="/" className={`btn btn-ghost justify-start w-full gap-3 px-3 normal-case ${
                 currentPath==="/" ? "btn-active":""
             }`}>
@@ -39,6 +51,30 @@ const SideLayout = () => {
                 <span>Notifications</span>
             
             </Link>
+
+
+            <div className='border-t pt-5'>
+                <div className='flex space-x-4'>
+
+                    <MessageCircle className=' ml-1 text-primary w-8 h-8'/> 
+                    <h2 className='text-2xl'>Your Friends </h2>
+                </div>
+            {loadingFriends ? (
+                <div className='flex justify-center py-122'>
+                    <span className='loading loading-spinner loading-lg'>
+                    </span>
+                </div>
+            ):
+            friends.length===0 ?(
+                <NoFriendsFound />
+            ):(
+                <div className='mt-4'>
+                    {friends.map((friend)=>(
+                    <FriendNav  key={friend._id} friend={friend}/>
+                    ))}
+                </div>
+            )}
+            </div>
         </nav>
 
         <div className='p-4 border-t border-base 300 mt-auto'>

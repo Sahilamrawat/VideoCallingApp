@@ -41,14 +41,10 @@ const Navheader = () => {
         {/* right Side */}
         <div className='container mx-auto px-4 sm:px-6 lg:px-1'>
             <div className='flex items-center justify-end w-full'>
-                {isChatPage &&(
-                    <div className='pl-5'>
-                        <Link to="/" className="flex items-center gap-2.5">
-                            <Boxes className='size-9  text-primary' />
-                            <span className="text-3xl font-bold font-mono bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent tracking-wider">VivoChat</span>
-                        </Link>
-                    </div>
-                )}
+                <div>
+
+                </div>
+                
                 <div className='flex items-center gap-3 sm:gap-4'>
                     <Link to="/notifications">
                         <button className='btn btn-ghost btn-circle '>

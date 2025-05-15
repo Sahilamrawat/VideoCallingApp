@@ -36,18 +36,32 @@ export default function App() {
     <div className="h-[100vh]" data-theme={theme} >
       
       <Routes>
+
+
         <Route path="/" element={isAuthenticated && isOnBoarded ? ( 
           <Layout showSideBar={true}>
             <HomePage/>
           </Layout> ): 
           (<Navigate to={!isAuthenticated ? "/login" : "/onboarding"}/>)}/>
+
+
+
         <Route path="/login" element={!isAuthenticated ? <LoginPage/>:<Navigate to={isOnBoarded?"/":"/onboarding"}/>}/>
+
+
+
         <Route path="/signup" element={!isAuthenticated ?<SignUpPage/>:<Navigate to={isOnBoarded?"/":"/onboarding"}/>}/>
+
+
+
         <Route path="/onboarding" element={isAuthenticated ?
         (
           !isOnBoarded ? (<OnboardingPage/>):(<Navigate to='/'/> )
           
         ) :( <Navigate to='/login '/>)}/>
+
+
+
         <Route path="/notifications" element={isAuthenticated && isOnBoarded ?(
           <Layout showSideBar={true}>
             <NotificationsPage/>
@@ -55,8 +69,25 @@ export default function App() {
 
           ):(<Navigate to={!isAuthenticated ? "/login" : "/onboarding"}/>)
         }/>
-        <Route path="/call" element={isAuthenticated ?<CallPage/>:<Navigate to='/login '/>}/>
-        <Route path="/chat" element={isAuthenticated ?<ChatPage/>:<Navigate to='/login '/>}/>
+
+
+
+
+        <Route path="/call/:id" element={isAuthenticated && isOnBoarded ? (
+          <Layout showSideBar={true}>
+            <CallPage/>
+          </Layout>
+          ):(<Navigate to={!isAuthenticated ? '/login ':"/onboarding"}/>)}/>
+
+
+
+
+        <Route path="/chat/:id" element={isAuthenticated && isOnBoarded ? (
+          <Layout showSideBar={true} >
+            <ChatPage/>
+          </Layout>
+          ):(<Navigate to={!isAuthenticated ? '/login ':"/onboarding"}/>)}/>
+
       </Routes>
       <Toaster/>
     </div>

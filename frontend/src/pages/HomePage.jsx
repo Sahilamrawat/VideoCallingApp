@@ -10,7 +10,7 @@ import NoFriendsFound from '../components/NoFriendsFound'
 
 const HomePage = () => {
 
-  const queryClient=useQueryClient();
+  
   const [outgoingRequestsIds,setOutgoingRequestsIds]=useState(new Set());
 
   const {data:friends=[], isLoading:loadingFriends} =useQuery(

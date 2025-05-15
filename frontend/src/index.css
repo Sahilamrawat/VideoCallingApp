@@ -1,3 +1,58 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Entire chat container */
+.str-chat__container {
+    @apply bg-base-200 text-base-content rounded-lg max-w-[1400px] w-[97%] mx-auto mt-4  flex flex-col overflow-y-hidden  ;
+  }
+  
+  /* Only the chat list scrolls */
+  .str-chat__list {
+    @apply bg-base-300 rounded-lg p-4 flex-1 overflow-scroll;
+  }
+  .str-chat__channel-header {
+    @apply bg-base-200  rounded-lg text-base-content px-4 py-3;
+  }
+  
+  /* Message input stays fixed at the bottom */
+  .str-chat__message-input {
+    @apply border-accent  rounded-lg  p-2 mb-2;
+  }
+  
+  /* Optional: channel wrapper fills screen */
+  .str-chat__channel {
+    @apply flex items-center justify-center bg-base-100 text-base-content;
+  }
+  .str-chat__textarea {
+    @apply text-base text-base-content bg-transparent;
+    font-family: inherit;
+    border: none;
+    outline: none;
+  }
+
+
+
+
+
+  
+  /* video call */
+  .str-video__participant-details__name {
+    @apply  text-white font-semibold text-sm;
+  }
+  
+  .str-video__call-controls {
+    @apply bg-base-100 p-4 rounded-xl ;
+  }
+  .str-video__video-placeholder{
+    @apply bg-primary/25
+  }
+  .str-video__speaker-layout {
+    @apply rounded-lg  text-base-content shadow-md;
+  }
+  .str-video__notification{
+    @apply bg-info
+  }
+  .str-video__notification__message{
+    @apply text-white
+  }
