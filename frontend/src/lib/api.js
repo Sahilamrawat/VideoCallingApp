@@ -53,6 +53,7 @@ export async function sendFriendRequest(userId){
 }
 
 export async function getFriendsRequests(){
+    console.log("🔁 Refetching friend requests...");
     const res=await axiosInstance.get('/users/friend-requests');
     return res.data;
 }

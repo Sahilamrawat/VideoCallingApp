@@ -56,7 +56,7 @@ const CallPage = () => {
         const callInstance = videoClient.call("default", callId);
         await callInstance.join({ create: true });
 
-        setClient(videoClient);
+        setClient(videoClient)                                                              ;
         setCall(callInstance);
       } catch (error) {
         console.error("Error Joining Call", error);

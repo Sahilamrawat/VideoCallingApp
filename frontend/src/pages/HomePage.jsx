@@ -7,12 +7,19 @@ import { Link } from 'react-router-dom'
 import { CheckCircleIcon, MapPinIcon, UserPlusIcon, UsersIcon } from 'lucide-react'
 import FriendCard, { getLanguageFlag } from '../components/FriendCard'
 import NoFriendsFound from '../components/NoFriendsFound'
+import MakeGroup from '../components/MakeGroup'
+import { StreamChat } from 'stream-chat';
+import { getStreamToken } from '../lib/api'; // You already have this
+import useAuthUser from '../hooks/useAuthUser'; // Already imported
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
 
   
   const [outgoingRequestsIds,setOutgoingRequestsIds]=useState(new Set());
+  const [showGroupModal, setShowGroupModal] = useState(false);
 
+  const queryClient=useQueryClient();
   const {data:friends=[], isLoading:loadingFriends} =useQuery(
     {
       queryKey:["friends"],
@@ -37,12 +44,26 @@ const HomePage = () => {
     mutationFn:sendFriendRequest,
     onSuccess:()=> {queryClient.invalidateQueries({queryKey:["outgoingFriendReqs"]})
     queryClient.invalidateQueries({queryKey:["friends"]})
+    const bc = new BroadcastChannel('friend-requests');
+    bc.postMessage('new-request');
+    console.log("📤 Sent 'new-request' via BroadcastChannel");
+
+    bc.close();
     }
 
 
   });
 
+  const [groups, setGroups] = useState([]);
+  const [client, setClient] = useState(null);
+  const { authUser } = useAuthUser();
+  const navigate = useNavigate();
 
+  const { data: tokenData } = useQuery({
+    queryKey: ['streamToken'],
+    queryFn: getStreamToken,
+    enabled: !!authUser,
+  });
   
 
   useEffect(()=>{
@@ -55,13 +76,44 @@ const HomePage = () => {
       
       setOutgoingRequestsIds(outgoingIds)
     }
-  },[outgoingFriendReqs]);
+    const initStreamClient = async () => {
+      if (!tokenData?.token || !authUser) return;
+    
+      const chatClient = StreamChat.getInstance(import.meta.env.VITE_STREAM_API_KEY);
+    
+      await chatClient.connectUser(
+        {
+          id: authUser._id,
+          name: authUser.fullName,
+          image: authUser.profilePic,
+        },
+        tokenData.token
+      );
+    
+      const userChannels = await chatClient.queryChannels(
+        {
+          type: 'messaging',
+          members: { $in: [authUser._id] },
+          name: { $exists: true }, // Only get channels with a name
+        },
+        { created_at: -1 }, // Optional: sort newest first
+        {
+          limit: 30, // Optional
+        }
+      );
+      
+      // Just show all named channels without filtering by member count
+      setGroups(userChannels);
+      setClient(chatClient);
+    
+    };
+    initStreamClient();
+  },[outgoingFriendReqs,tokenData, authUser]);
+  
 
-
-
-
+  
   return (
-    <div className='p-4 sm:p-6 lg:p-8'>
+    <div className='bg-base-100 p-4 sm:p-6 lg:p-8'>
       <div className='container mx-auto space-y-10'>
           <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
               <h2 className='text-2xl sm:text-3xl font-bold tracking-tight'>
@@ -189,6 +241,54 @@ const HomePage = () => {
 
               
           </section>
+          <section>
+            <div className='flex items-center justify-between mb-6 sm:mb-8'>
+              <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+                <div>
+                  <h2 className='text-2xl sm:text-3xl font-bold tracking-tight'>
+                    Join Groups
+                  </h2>
+                  <p className='opacity-70'>
+                    Discover Perfect language groups and learn
+                  </p>
+                </div>
+              </div>
+              <button
+                className='btn btn-outline btn-primary'
+                onClick={() => setShowGroupModal(true)}
+              >
+                Create Group
+              </button>
+            </div>
+          </section>
+
+          {showGroupModal && (
+            <MakeGroup
+              onClose={() => setShowGroupModal(false)}
+            />
+          )}
+
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold mb-2">Your Groups</h3>
+            {groups.length === 0 ? (
+              <p className="opacity-60">You're not in any groups yet.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+                {groups.map((group) => (
+                  <div key={group.id} className="flex flex-col   bg-base-200 border-base-300 rounded-lg p-4 shadow-sm m-2">
+                    <h4 className="mt-3 h-[6vh] rounded-full font-bold text-lg ">Group Name:<span className='text-accent text-xl p-3'>{group.data.name || "Unnamed Group"}</span></h4>
+                    
+                    <button
+                      className="btn btn-sm btn-primary mt-2"
+                      onClick={() => navigate(`/group-chat/${group.id}`)}
+                    >
+                      Open Chat
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
       </div>
     </div>
   )

@@ -14,6 +14,7 @@ import useAuthUser from "./hooks/useAuthUser.jsx"
 import { use } from "react"
 import { useThemeStore } from "./store/useThemeStore.js"
 import Layout from "./components/Layout.jsx"
+import GroupChatPage from "./pages/GroupChatPage.jsx"
 export default function App() {
   
 
@@ -31,6 +32,7 @@ export default function App() {
       <PageLoader/>
     )
   }
+  
   return (
     
     <div className="h-[100vh]" data-theme={theme} >
@@ -88,6 +90,11 @@ export default function App() {
           </Layout>
           ):(<Navigate to={!isAuthenticated ? '/login ':"/onboarding"}/>)}/>
 
+        <Route path="/group-chat/:channelId" element={isAuthenticated && isOnBoarded ? (
+          <Layout showSideBar={true} >
+            <GroupChatPage/>
+          </Layout>
+          ):(<Navigate to={!isAuthenticated ? '/login ':"/onboarding"}/>)}/>
       </Routes>
       <Toaster/>
     </div>

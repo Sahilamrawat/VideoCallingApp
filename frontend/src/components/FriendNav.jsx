@@ -7,7 +7,7 @@ const FriendNav = ({friend}) => {
     const currentPath=location.pathname;
     const navigate=useNavigate();
     return (
-        <div className={`btn btn-ghost flex justify-start w-full rounded-lg hover:shadow-md transition-shadow overflow-y-scroll mb-1 ${currentPath=== `/chat/${friend._id}` ? "btn-active":""} `}>
+        <div className={`btn btn-ghost flex justify-start w-full rounded-lg hover:shadow-md transition-shadow overflow-y-scroll ${currentPath=== `/chat/${friend._id}` ? "btn-active":""} `}>
             <div className='flex items-center p-2 cursor-pointer ' onClick={() => navigate(`/chat/${friend._id}`)}>
                 <div className='flex items-center gap-3 '>
                     <div className='avatar size-7'>
