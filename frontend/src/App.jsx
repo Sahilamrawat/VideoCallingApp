@@ -15,7 +15,7 @@ import { use } from "react"
 import { useThemeStore } from "./store/useThemeStore.js"
 import Layout from "./components/Layout.jsx"
 import GroupChatPage from "./pages/GroupChatPage.jsx"
-import OnBoardingPage from "./pages/OnboardingPage"
+import OnBoardingPage from "./pages/OnBoardingPage"
 export default function App() {
   
 
