@@ -65,17 +65,18 @@ const HomePage = () => {
     enabled: !!authUser,
   });
   
+  useEffect(() => {
+    const outgoingIds = new Set();
+    if (outgoingFriendReqs && outgoingFriendReqs.length > 0) {
+      outgoingFriendReqs.forEach((req) => {
+        console.log(req);
+        outgoingIds.add(req.recipient._id);
+      });
+      setOutgoingRequestsIds(outgoingIds);
+    }
+  }, [outgoingFriendReqs]);
 
   useEffect(()=>{
-    const outgoingIds=new Set();
-    if(outgoingFriendReqs && outgoingFriendReqs.length>0){
-      outgoingFriendReqs.forEach((req)=>{
-        console.log(req);
-        outgoingIds.add(req.recipient._id)
-      })
-      
-      setOutgoingRequestsIds(outgoingIds)
-    }
     const initStreamClient = async () => {
       if (!tokenData?.token || !authUser) return;
     

@@ -44,13 +44,17 @@ const SideLayout = () => {
       );
       useEffect(() => {
         const bc = new BroadcastChannel('friend-requests');
+      
         bc.onmessage = (event) => {
-            console.log("📥 Received broadcast message:", event.data);
+          console.log("📥 Received broadcast message:", event.data);
           if (event.data === 'new-request') {
             queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
-            
           }
         };
+      
+        return () => bc.close(); // Cleanup
+      }, []);
+      useEffect(() => {
         const initStreamClient = async () => {
             if (!tokenData?.token || !authUser) return;
         
@@ -83,7 +87,7 @@ const SideLayout = () => {
         
         };
         initStreamClient();
-        return () => bc.close();
+        
       }, [tokenData, authUser]);
       
       

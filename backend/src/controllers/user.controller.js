@@ -22,7 +22,7 @@ export async function getRecommendedUsers(req,res){
 
 export async function getmyFriends(req,res){
     try {
-        const user=await User.findById(req.user._id).select("friends").populate("friends","fullName profilePic nativeLanguage learningLanguage location");
+        const user=await User.findById(req.user.id).select("friends").populate("friends","fullName profilePic nativeLanguage learningLanguage location");
         res.status(200).json(user.friends);
     } catch (error) {
         console.log("Error in getting friends",error);
@@ -65,7 +65,7 @@ export async function sendFriendRequest(req,res){
             sender:myId,
             recipient:recipientId,
         });
-        res.status(200).json({friendRequest});
+        res.status(200).json(friendRequest);
     } catch (error) {
         console.log("Error in sending friend request",error);  
         return res.status(500).json({message:"Internal Server Error"});
@@ -95,7 +95,7 @@ export async function acceptFriendRequest(req,res){
             }
         });
 
-        await User.findByIdAndUpdate(friendRequest.sender,{
+        await User.findByIdAndUpdate(friendRequest.recipient,{
             $addToSet:{
                 friends:friendRequest.sender
             }
