@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom"
 import HomePage from "./pages/HomePage"
 import LoginPage from "./pages/LoginPage"
 import SignUpPage from "./pages/SignUpPage"
-import OnboardingPage from "./pages/OnboardingPage"
+
 import NotificationsPage from "./pages/NotificationsPage"
 import CallPage from "./pages/CallPage"
 import ChatPage from "./pages/ChatPage"
@@ -15,6 +15,7 @@ import { use } from "react"
 import { useThemeStore } from "./store/useThemeStore.js"
 import Layout from "./components/Layout.jsx"
 import GroupChatPage from "./pages/GroupChatPage.jsx"
+import OnBoardingPage from "./pages/OnboardingPage"
 export default function App() {
   
 
@@ -58,7 +59,7 @@ export default function App() {
 
         <Route path="/onboarding" element={isAuthenticated ?
         (
-          !isOnBoarded ? (<OnboardingPage/>):(<Navigate to='/'/> )
+          !isOnBoarded ? (<OnBoardingPage/>):(<Navigate to='/'/> )
           
         ) :( <Navigate to='/login '/>)}/>
 
