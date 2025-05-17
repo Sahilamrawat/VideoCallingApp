@@ -12,7 +12,8 @@ import { getStreamToken } from '../lib/api'; // You already have this
 import useAuthUser from '../hooks/useAuthUser'; // Already imported
 import { useNavigate } from 'react-router-dom';
 
-const SideLayout = () => {
+const SideLayout = ({showSideBar, setShowSideBar}) => {
+    const [unreadChannels, setUnreadChannels] = useState(new Set());
 
     
     const [showGroupModal, setShowGroupModal] = useState(false);
@@ -84,6 +85,26 @@ const SideLayout = () => {
             // Just show all named channels without filtering by member count
             setGroups(userChannels);
             setClient(chatClient);
+            chatClient.on('message.new', (event) => {
+                const channelId = event.channel_id;
+                
+
+                if (event.user.id === authUser._id) return;
+
+                // 🛡️ Also ignore if the user is currently on that chat screen
+                if (location.pathname === `/group-chat/${channelId}`) return;
+
+                // Don't notify if already in that chat route
+                if (location.pathname !== `/group-chat/${channelId}`) {
+                    setUnreadChannels((prev) => new Set(prev).add(channelId));
+                }
+                if (location.pathname !== `/chat/${getOtherUserIdFromChannel(channelId, authUser._id)}`) {
+                    setUnreadChannels((prev) => new Set(prev).add(channelId));
+                }
+                });
+                return () => {
+                chatClient.off('message.new');
+                };
         
         };
         initStreamClient();
@@ -94,7 +115,21 @@ const SideLayout = () => {
       console.log("🔔 Render incomingRequests count:", incomingRequests.length);
 
   return (
-    <aside className='w-64 bg-base-200 border-r border-base-300 hidden h-screen sticky  lg:flex flex-col top-0 '>
+    <>
+    
+    <div
+        className={`fixed inset-0 z-40 bg-black/30 transition-opacity duration-300 lg:hidden ${
+          showSideBar ? 'opacity-100 visible' : 'opacity-0 invisible'
+        }`}
+        onClick={() => setShowSideBar(false)} // ✅ CLOSE SIDEBAR when clicked outside
+      />
+    <aside className={`w-64 bg-base-200 border-r border-base-300 h-full top-0 z-50
+        fixed lg:sticky
+        transform transition-transform duration-300
+        ${showSideBar ? 'translate-x-0' : '-translate-x-full'}
+        lg:translate-x-0
+        flex flex-col
+      `}>
         <div className=' p-5 '>
             <Link to="/" className="flex items-center gap-2.5">
                 <Boxes className='size-9  text-primary' />
@@ -146,7 +181,8 @@ const SideLayout = () => {
                     ):(
                         <div className='mt-4'>
                             {friends.map((friend)=>(
-                            <FriendNav  key={friend._id} friend={friend}/>
+                            <FriendNav  key={friend._id} friend={friend} unreadChannels={unreadChannels}
+                            authUserId={authUser._id}/>
                             ))}
                         </div>
                     )}
@@ -170,12 +206,29 @@ const SideLayout = () => {
                         ) : (
                         <div>
                             {groups.map((group) => (
-                            <Link to={`/group-chat/${group.id}`} key={group.id} className={`btn btn-ghost flex justify-start items-center w-full rounded-lg hover:shadow-md transition-shadow ${currentPath=== `/group-chat/${group.id}` ? "btn-active":""} `}>
-                                <MessageCircleCode/>
-                                <span className='text-base-content text-lg'>{group.data.name || "Unnamed Group"}</span>
-                                
-                                
-                            </Link>
+                            <Link
+                            to={`/group-chat/${group.id}`}
+                            key={group.id}
+                            className={`btn btn-ghost flex justify-start items-center w-full rounded-lg hover:shadow-md transition-shadow ${
+                              currentPath === `/group-chat/${group.id}` ? "btn-active" : ""
+                            }`}
+                            onClick={() => {
+                              // Clear unread notification when opened
+                              setUnreadChannels((prev) => {
+                                const updated = new Set(prev);
+                                updated.delete(group.id);
+                                return updated;
+                              });
+                            }}
+                          >
+                            <MessageCircleCode />
+                            <span className='text-base-content text-lg ml-2'>{group.data.name || "Unnamed Group"}</span>
+                            {unreadChannels.has(group.id) && (
+                              <span className="ml-auto bg-error text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">
+                                •
+                              </span>
+                            )}
+                          </Link>
                             ))}
                         </div>
                         )}
@@ -204,8 +257,17 @@ const SideLayout = () => {
             </div>
         </div>
     </aside>
+    </>
     
   )
+}
+
+
+
+function getOtherUserIdFromChannel(channelId, selfId) {
+  return channelId
+    .split('-')
+    .find(id => id !== selfId);
 }
 
 export default SideLayout

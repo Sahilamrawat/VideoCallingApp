@@ -1,5 +1,5 @@
-import { BellIcon, Boxes, CameraIcon, LogOutIcon, PawPrint } from 'lucide-react'
-import React from 'react'
+import { BellIcon, Boxes, CameraIcon, LogOutIcon, LucideHamburger, MenuIcon, PawPrint } from 'lucide-react'
+import React, { useState } from 'react'
 import useAuthUser from '../hooks/useAuthUser';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -7,10 +7,12 @@ import { logout } from '../lib/api';
 import toast from 'react-hot-toast';
 import { Link, Navigate, useLocation, } from 'react-router-dom';
 import ThemeSelector from './ThemeSelector';
+import SideLayout from './SideLayout';
 
 const Navheader = () => {
 
   const {authUser} = useAuthUser();
+  const [showSideBar, setShowSideBar]= useState(false);
   const location=useLocation();
   const isChatPage=location.pathname?.startsWith("/chat");
   const queryClient = useQueryClient();
@@ -36,8 +38,15 @@ const Navheader = () => {
         
         
         
-
-
+        <div className='lg:hidden'>
+          <button className='p-2 ml-4' onClick={()=>setShowSideBar(true)}>
+            <MenuIcon className='size-6'/>
+          </button>
+          {showSideBar &&(
+            <SideLayout showSideBar={showSideBar} setShowSideBar={setShowSideBar} onClose={() => setShowSideBar(false)}/>
+          )}
+        </div>
+        
         {/* right Side */}
         <div className='container mx-auto px-4 sm:px-6 lg:px-1'>
             <div className='flex items-center justify-end w-full'>
